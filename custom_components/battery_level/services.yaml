@@ -1,0 +1,5 @@
+update:
+  description: "Updates the data of all components"
+
+send_report:
+  description: "Notifies about low threshold of battery level"

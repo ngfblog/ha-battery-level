@@ -1,0 +1,8 @@
+{
+    "domain": "battery_level",
+    "name": "Battery Level",
+    "documentation": "https://github.com/elad-bar/ha-battery-level/blob/master/README.md",
+    "dependencies": ["binary_sensor", "sensor", "switch", "lock", "light", "zwave", "climate", "notify"],
+    "codeowners": ["@elad-bar"],
+    "requirements": []
+  }
