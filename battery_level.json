@@ -1,6 +1,6 @@
 {
     "battery_level": {
-        "version": "1.0.6",
+        "version": "1.0.7",
         "local_location": "/custom_components/battery_level/__init__.py",
         "remote_location": "https://raw.githubusercontent.com/elad-bar/ha-battery-level/master/custom_components/battery_level/__init__.py",
         "visit_repo": "https://github.com/elad-bar/ha-battery-level",

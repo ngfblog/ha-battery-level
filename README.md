@@ -6,12 +6,6 @@ Create sensor for each component that contains battery_level in the attributes (
 <pre>
 configuration: 
     battery_level:
-        #Optional - if not available, will not generate a report
-        notify:                                        
-            #Required - include all entities in the report when threshold gets lower than defined
-            threshold: 35                              
-            #Required - using which entit to deliver the notification
-            notifier_entity_id: notify.entity_id
 </pre>
 
 <h2>Custom_updater</h2>

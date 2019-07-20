@@ -5,7 +5,7 @@ https://home-assistant.io/components/ham/
 """
 from datetime import timedelta
 
-VERSION = '1.0.6'
+VERSION = '1.0.7'
 
 DOMAIN = 'battery_level'
 DATA_BL = 'data_{}'.format(DOMAIN)
@@ -21,9 +21,4 @@ ATTR_FRIENDLY_NAME = 'friendly_name'
 ATTR_LOW_BATTERY_ENTITY_IDS = 'entities'
 ATTR_UNIT_OF_MEASUREMENT = 'unit_of_measurement'
 
-CONF_NOTIFY = 'notify'
-CONF_NOTIFY_ENTITY_ID = 'notifier_entity_id'
-CONF_NOTIFY_WHEN = 'notification_time'
-
-CONF_THRESHOLD = 'threshold'
 SCAN_INTERVAL = timedelta(minutes=60)

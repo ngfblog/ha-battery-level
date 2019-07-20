@@ -8,7 +8,6 @@ import logging
 
 from homeassistant.const import (EVENT_HOMEASSISTANT_START)
 from homeassistant.helpers.event import track_time_interval
-from time import gmtime, strftime
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -30,11 +29,10 @@ _LOGGER = logging.getLogger(__name__)
 class BatteryLevelData:
     """The Class for handling the data retrieval."""
 
-    def __init__(self, hass, scan_interval, notify_data):
+    def __init__(self, hass, scan_interval):
         """Initialize the data object."""
         _LOGGER.debug("BatteryLevelData initialization")
 
-        self._notify_data = notify_data
         self._entity_ids = []
         self._low_battery_level = []
 
@@ -46,17 +44,10 @@ class BatteryLevelData:
             _LOGGER.debug(f'Updating Battery Level component, at {event_time}')
             self.update()
 
-        def bl_notify(event_time):
-            """Call Battery Level to refresh information."""
-            _LOGGER.debug(f'Notify Battery Level component, at {event_time}')
-            self.notify()
-
         self._bl_refresh = bl_refresh
-        self._bl_notify = bl_notify
 
         # register service
         hass.services.register(DOMAIN, 'update', bl_refresh)
-        hass.services.register(DOMAIN, 'send_report', bl_notify)
 
         # register scan interval for Battery Level
         track_time_interval(hass, bl_refresh, scan_interval)
@@ -112,58 +103,18 @@ class BatteryLevelData:
                             _LOGGER.info(f'{log_message} created, Level: {battery_level_state}')
                             self._entity_ids.append(battery_level_entity_id)
 
-                        battery_level_value = float(battery_level_state)
-                        threshold = float(self._notify_data[CONF_THRESHOLD])
-
-                        if self._notify_data is not None and battery_level_value <= threshold:
-                            self._low_battery_level.append(battery_level_entity_id)
-
                         if should_update:
-                            self._hass.states.set(battery_level_entity_id, battery_level_state, battery_level_attributes)
+                            self._hass.states.set(battery_level_entity_id, battery_level_state,
+                                                  battery_level_attributes)
                     else:
                         _LOGGER.info(
-                            f'Entity {entity_id} contains battery_level attribute, Invalid state: {battery_level_state}')
+                            f'Invalid Entity battery_level attribute for {entity_id}: {battery_level_state}')
             except Exception as ex:
                 exc_type, exc_obj, tb = sys.exc_info()
                 line_number = tb.tb_lineno
+                error_message = f"Error: {str(ex)}, Line: {line_number}"
 
-                _LOGGER.error(f'Failed to create battery level sensor for {entity_id}, Error: {str(ex)}, Line: {line_number}')
-
-    def notify(self):
-        if self._notify_data is not None:
-
-            threshold = self._notify_data[CONF_THRESHOLD]
-            notify_entity_id = self._notify_data[CONF_NOTIFY_ENTITY_ID]
-
-            title = f'*Low Battery Report (=<{threshold}%)*'
-            message = "None of the component is below threshold"
-
-            _LOGGER.info(f'Notify data: {self._notify_data}')
-
-            low_battery_level_state = len(self._low_battery_level)
-
-            if low_battery_level_state > 0:
-                message_items = []
-                for entity_id in self._low_battery_level:
-                    item = self._hass.states.get(entity_id)
-
-                    if item is not None:
-                        name = item.attributes[ATTR_FRIENDLY_NAME].replace(DEFAULT_NAME, '')
-
-                        message_items.append(f' - {name} ({item.state}%)')
-
-                message = '\r\n'.join([str(x) for x in message_items])
-
-            entity_id = notify_entity_id.replace(f'{NOTIFY_DOMAIN}.', '')
-
-            data = {
-                'title': title,
-                'message': message
-            }
-
-            _LOGGER.info(f'Sending notification via {entity_id}: {data}')
-
-            self._hass.services.call(NOTIFY_DOMAIN, entity_id, data, False)
+                _LOGGER.error(f'Failed to create battery level sensor for {entity_id}, {error_message}')
 
     def update_low_battery_summary(self):
         low_battery_level_entity_id = f'{SENSOR_DOMAIN}.low_battery_level'
@@ -199,12 +150,6 @@ class BatteryLevelData:
                 self.load_domain_entities(domain)
 
             self.update_low_battery_summary()
-
-            time_now = strftime("%H:%M", gmtime())
-
-            if self._notify_data is not None and CONF_NOTIFY_WHEN in self._notify_data and time_now == \
-                    self._notify_data[CONF_NOTIFY_WHEN]:
-                self.notify()
 
             _LOGGER.debug("update - Completed")
         except Exception as ex:
