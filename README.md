@@ -14,6 +14,6 @@ custom_updater:
   track:
     - components
   component_urls:
-    - https://raw.githubusercontent.com/elad-bar/ha-battery-level/master/battery_level.json
+    - https://raw.githubusercontent.com/ngfblog/ha-battery-level/master/battery_level.json
 </pre>
 
